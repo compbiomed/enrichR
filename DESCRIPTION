@@ -1,0 +1,20 @@
+Package: enrichR
+Title: R Interface to Enrichr API
+Version: 0.0.0.9000
+Authors@R: person("Sean", "Corbett", email = "scorbett@bu.edu", role = c("aut", "cre"))
+Description: This package allows interaction with the Ma'yan Lab's Enrichr
+    tool, which performs functional enrichment on a gene list across many different
+    databases.
+Depends:
+    R (>= 3.2.2)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:
+    httr,
+    rjson,
+    plyr,
+    dplyr,
+    data.table,
+    testit
+RoxygenNote: 5.0.1
