@@ -13,12 +13,13 @@ db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_P
 #' @param up.genes a list of up-regulated gene symbols
 #' @param dn.genes a list of down-regulated gene symbols
 #' @param databases a list of Enrichr-fronted databases, as mentioned above
+#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways
 #' @keywords functional enrichment Enrichr
 #' @export
-enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list) {
-    up.gene.res <- enrichGeneList(up.genes, databases)
+enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list, fdr.cutoff=NULL) {
+    up.gene.res <- enrichGeneList(up.genes, databases, fdr.cutoff)
     up.gene.res$direction <- "UP"
-    dn.gene.res <- enrichGeneList(dn.genes, databases)
+    dn.gene.res <- enrichGeneList(dn.genes, databases, fdr.cutoff)
     dn.gene.res$direction <- "DN"
     return(rbind(up.gene.res, dn.gene.res))
 }
@@ -34,9 +35,10 @@ enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list) {
 #' 
 #' @param gene.list a list of gene symbols
 #' @param databases a list of Enrichr-fronted databases, as mentioned above
+#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways
 #' @keywords functional enrichment Enrichr
 #' @export
-enrichGeneList <- function(gene.list, databases=db.list) {
+enrichGeneList <- function(gene.list, databases=db.list, fdr.cutoff=NULL) {
     ######Step 1: Post gene list to EnrichR
     req.body <- list(list=paste(gene.list, collapse="\n"))
     post.req <- httr::POST("http://amp.pharm.mssm.edu/Enrichr/enrich", encode="multipart", body=I(req.body))
@@ -62,6 +64,10 @@ enrichGeneList <- function(gene.list, databases=db.list) {
     
     query.results <- as.data.frame(data.table::rbindlist(database.enrichments))
     colnames(query.results) <- c("database", "category", "pval", "qval", "genes")
+    
+    if (!is.null(fdr.cutoff)) {
+        query.results <- query.results[query.results$qval < fdr.cutoff, ]
+    }
     
     return(query.results)
 }
