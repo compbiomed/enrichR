@@ -6,7 +6,7 @@ Description: This package allows interaction with the Ma'yan Lab's Enrichr
     tool, which performs functional enrichment on a gene list across many different
     databases.
 Depends:
-    R (>= 3.2.2)
+    R (>= 3.1.1)
 License: MIT
 Encoding: UTF-8
 LazyData: true
