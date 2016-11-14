@@ -1,4 +1,4 @@
-db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_Process")
+db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_Process_2015")
 
 
 #' Perform functional enrichment on a pair of "up"- and "down"- regulated genes sets,
