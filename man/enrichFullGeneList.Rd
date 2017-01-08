@@ -5,7 +5,8 @@
 \title{Perform functional enrichment on a pair of "up"- and "down"- regulated genes sets,
 such as those generated in a differential expression analysis.}
 \usage{
-enrichFullGeneList(up.genes, dn.genes, databases = db.list)
+enrichFullGeneList(up.genes, dn.genes, databases = db.list,
+  fdr.cutoff = NULL)
 }
 \arguments{
 \item{up.genes}{a list of up-regulated gene symbols}
@@ -13,10 +14,12 @@ enrichFullGeneList(up.genes, dn.genes, databases = db.list)
 \item{dn.genes}{a list of down-regulated gene symbols}
 
 \item{databases}{a list of Enrichr-fronted databases, as mentioned above}
+
+\item{fdr.cutoff}{An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways}
 }
 \description{
 This function wraps enrichGeneList to call Enrichr to perform functional enrichment tests on
-the provided gene lists, for the databases specified in the databases argument. 
+the provided gene lists, for the databases specified in the databases argument.
 Databases are specified as seen in the web interface, with underscores for spaces
 (e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). There's no way to query Enrichr
 to get these database names, so they can't be provided as options. You'll just have to guess. Sorry :/
