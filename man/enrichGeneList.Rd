@@ -4,21 +4,22 @@
 \alias{enrichGeneList}
 \title{Perform functional enrichment on a set of genes.}
 \usage{
-enrichGeneList(gene.list, databases = db.list, fdr.cutoff = NULL)
+enrichGeneList(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1)
 }
 \arguments{
-\item{gene.list}{a list of gene symbols}
+\item{gene.list}{a character vector of gene symbols. Required}
 
-\item{databases}{a list of Enrichr-fronted databases, as mentioned above}
+\item{databases}{a character vector of Enrichr-fronted databases. Default: KEGG_2016}
 
-\item{fdr.cutoff}{An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways}
+\item{fdr.cutoff}{An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways.
+Default = 0.1}
 }
 \description{
 This function interacts with Enrichr's REST API in order to perform functional enrichment of a single
 set of genes, for a set of specified databases which are already fronted by Enrichr.
 Databases are specified as seen in the web interface, with underscores for spaces
-(e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). There's no way to query Enrichr
-to get these database names, so they can't be provided as options. You'll just have to guess. Sorry :/
+(e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). See \url{http://amp.pharm.mssm.edu/Enrichr/#stats}
+for more databases.
 }
 \examples{
 \\donotrun{

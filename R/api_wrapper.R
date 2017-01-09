@@ -17,12 +17,20 @@ db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_P
 #' Default = 0.1
 #' @keywords functional enrichment Enrichr
 #' @export
-enrichFullGeneList <- function(up.genes, dn.genes, databases = "KEGG_2016", fdr.cutoff = NULL) {
+enrichFullGeneList <- function(up.genes, dn.genes, databases = "KEGG_2016", fdr.cutoff = 0.1) {
     up.gene.res <- enrichGeneList(up.genes, databases, fdr.cutoff)
-    up.gene.res$direction <- "UP"
     dn.gene.res <- enrichGeneList(dn.genes, databases, fdr.cutoff)
-    dn.gene.res$direction <- "DN"
-    return(rbind(up.gene.res, dn.gene.res))
+    if (nrow(up.gene.res) > 0) {
+      up.gene.res$direction <- "UP"
+    }
+    if (nrow(dn.gene.res) > 0) {
+      dn.gene.res$direction <- "DN"
+    }
+    if (nrow(up.gene.res) == 0 & nrow(dn.gene.res) == 0) {
+      return(data.frame(databases = databases, category = "Nothing significant", stringsAsFactors = FALSE))
+    } else {
+      return(rbind(up.gene.res, dn.gene.res))
+    }
 }
 
 
