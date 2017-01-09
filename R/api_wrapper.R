@@ -6,17 +6,18 @@ db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_P
 #'
 #' This function wraps enrichGeneList to call Enrichr to perform functional enrichment tests on
 #' the provided gene lists, for the databases specified in the databases argument.
+#' Separate analyses are run on upregulated and downregulated genes, the returned results are rbind'ed.
 #' Databases are specified as seen in the web interface, with underscores for spaces
-#' (e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). There's no way to query Enrichr
-#' to get these database names, so they can't be provided as options. You'll just have to guess. Sorry :/
-#'
+#' (e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). See \url{http://amp.pharm.mssm.edu/Enrichr/#stats}
+#' for more databases.
 #' @param up.genes a list of up-regulated gene symbols
 #' @param dn.genes a list of down-regulated gene symbols
-#' @param databases a list of Enrichr-fronted databases, as mentioned above
-#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways
+#' @param databases a character vector of Enrichr-fronted databases. Default: KEGG_2016
+#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways.
+#' Default = 0.1
 #' @keywords functional enrichment Enrichr
 #' @export
-enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list, fdr.cutoff=NULL) {
+enrichFullGeneList <- function(up.genes, dn.genes, databases = "KEGG_2016", fdr.cutoff = NULL) {
     up.gene.res <- enrichGeneList(up.genes, databases, fdr.cutoff)
     up.gene.res$direction <- "UP"
     dn.gene.res <- enrichGeneList(dn.genes, databases, fdr.cutoff)
@@ -30,12 +31,13 @@ enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list, fdr.cutoff
 #' This function interacts with Enrichr's REST API in order to perform functional enrichment of a single
 #' set of genes, for a set of specified databases which are already fronted by Enrichr.
 #' Databases are specified as seen in the web interface, with underscores for spaces
-#' (e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). There's no way to query Enrichr
-#' to get these database names, so they can't be provided as options. You'll just have to guess. Sorry :/
+#' (e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). See \url{http://amp.pharm.mssm.edu/Enrichr/#stats}
+#' for more databases.
 #'
-#' @param gene.list a list of gene symbols
-#' @param databases a list of Enrichr-fronted databases, as mentioned above
-#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways
+#' @param gene.list a character vector of gene symbols. Required
+#' @param databases a character vector of Enrichr-fronted databases. Default: KEGG_2016
+#' @param fdr.cutoff An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways.
+#' Default = 0.1
 #' @keywords functional enrichment Enrichr
 #' @export
 #' @examples
@@ -46,7 +48,7 @@ enrichFullGeneList <- function(up.genes, dn.genes, databases=db.list, fdr.cutoff
 #' DT::datatable(res)
 #' }
 ##
-enrichGeneList <- function(gene.list, databases=db.list, fdr.cutoff=NULL) {
+enrichGeneList <- function(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1) {
     ######Step 1: Post gene list to EnrichR
     req.body <- list(list=paste(gene.list, collapse="\n"))
     post.req <- httr::POST("http://amp.pharm.mssm.edu/Enrichr/enrich", encode="multipart", body=I(req.body))
