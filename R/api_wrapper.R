@@ -18,19 +18,19 @@ db.list <- c("WikiPathways_2016", "KEGG_2016", "Biocarta_2016", "GO_Biological_P
 #' @keywords functional enrichment Enrichr
 #' @export
 enrichFullGeneList <- function(up.genes, dn.genes, databases = "KEGG_2016", fdr.cutoff = 0.1) {
-    up.gene.res <- enrichGeneList(up.genes, databases, fdr.cutoff)
-    dn.gene.res <- enrichGeneList(dn.genes, databases, fdr.cutoff)
-    if (nrow(up.gene.res) > 0) {
-      up.gene.res$direction <- "UP"
-    }
-    if (nrow(dn.gene.res) > 0) {
-      dn.gene.res$direction <- "DN"
-    }
-    if (nrow(up.gene.res) == 0 & nrow(dn.gene.res) == 0) {
-      return(data.frame(databases = databases, category = "Nothing significant", stringsAsFactors = FALSE))
-    } else {
-      return(rbind(up.gene.res, dn.gene.res))
-    }
+  up.gene.res <- enrichGeneList(up.genes, databases, fdr.cutoff)
+  dn.gene.res <- enrichGeneList(dn.genes, databases, fdr.cutoff)
+  if (nrow(up.gene.res) > 0) {
+    up.gene.res$direction <- "UP"
+  }
+  if (nrow(dn.gene.res) > 0) {
+    dn.gene.res$direction <- "DN"
+  }
+  if (nrow(up.gene.res) == 0 & nrow(dn.gene.res) == 0) {
+    return(data.frame(databases = databases, category = "Nothing significant", stringsAsFactors = FALSE))
+  } else {
+    return(rbind(up.gene.res, dn.gene.res))
+  }
 }
 
 
@@ -57,37 +57,40 @@ enrichFullGeneList <- function(up.genes, dn.genes, databases = "KEGG_2016", fdr.
 #' }
 ##
 enrichGeneList <- function(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1) {
-    ######Step 1: Post gene list to EnrichR
-    req.body <- list(list=paste(gene.list, collapse="\n"))
-    post.req <- httr::POST("http://amp.pharm.mssm.edu/Enrichr/enrich", encode="multipart", body=I(req.body))
-
-    #TODO: Real error handling..
-    if (!grepl("success", httr::http_status(post.req)$category, ignore.case=T)) stop("Posting gene list to EnrichR failed")
-
-    ######Step 2: Get results from posted gene list
-    database.enrichments <- list()
-    for (idx in 1:length(databases)) {
-        database <- databases[idx]
-        get.req <- httr::GET(paste("http://amp.pharm.mssm.edu/Enrichr/enrich?backgroundType=", database, sep=""))
-        if (!grepl("success", httr::http_status(get.req)$category, ignore.case=T)) stop("Retrieving results from EnrichR failed")
-
-        response.content <- mungeResponseContent(httr::content(get.req)[[database]])
-
-        if (length(response.content) > 1) {
-            database.res <- data.table::rbindlist(response.content)
-            database.res[, 1] <- rep(database, nrow(database.res))
-            database.enrichments[[idx]] <- database.res[, paste("V", c(1, 2, 3, 7, 6), sep=""), with=F]
-        }
+  ######Step 1: Post gene list to EnrichR
+  req.body <- list(list=paste(gene.list, collapse="\n"))
+  post.req <- httr::POST("http://amp.pharm.mssm.edu/Enrichr/enrich", encode="multipart", body=I(req.body))
+  
+  #TODO: Real error handling..
+  if (!grepl("success", httr::http_status(post.req)$category, ignore.case=T)) stop("Posting gene list to EnrichR failed")
+  
+  ######Step 2: Get results from posted gene list
+  database.enrichments <- list()
+  for (idx in 1:length(databases)) {
+    database <- databases[idx]
+    get.req <- httr::GET(paste("http://amp.pharm.mssm.edu/Enrichr/enrich?backgroundType=", database, sep=""))
+    if (!grepl("success", httr::http_status(get.req)$category, ignore.case=T)) stop("Retrieving results from EnrichR failed")
+    
+    response.content <- mungeResponseContent(httr::content(get.req)[[database]])
+    
+    if (length(response.content) > 1) {
+      database.res <- data.table::rbindlist(response.content)
+      database.res[, 1] <- rep(database, nrow(database.res))
+      database.enrichments[[idx]] <- database.res[, paste("V", c(1, 2, 3, 7, 6), sep=""), with=F]
     }
-
-    query.results <- as.data.frame(data.table::rbindlist(database.enrichments))
-    colnames(query.results) <- c("database", "category", "pval", "qval", "genes")
-
-    if (!is.null(fdr.cutoff)) {
-        query.results <- query.results[query.results$qval < fdr.cutoff, ]
-    }
-
-    return(query.results)
+  }
+  
+  query.results <- as.data.frame(data.table::rbindlist(database.enrichments))
+  if(dim(query.results)[1] == 0) {
+    stop('No results for those genes')
+  }
+  colnames(query.results) <- c("database", "category", "pval", "qval", "genes")
+  
+  if (!is.null(fdr.cutoff)) {
+    query.results <- query.results[query.results$qval < fdr.cutoff, ]
+  }
+  
+  return(query.results)
 }
 
 
@@ -104,16 +107,15 @@ enrichGeneList <- function(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1)
 #' @param response.content result of calling httr::content on the GET request to the Enrichr API, after submitting a list for enrichment.
 #'
 mungeResponseContent <- function(response.content) {
-    munged.content <- response.content
-    if (length(response.content) == 0) return(NA)
-
-    for (idx in 1:length(response.content)) {
-        munged.content[[idx]][[6]] <- paste(munged.content[[idx]][[6]], collapse=",")
-    }
-
-    return(munged.content)
+  munged.content <- response.content
+  if (length(response.content) == 0) return(NA)
+  
+  for (idx in 1:length(response.content)) {
+    munged.content[[idx]][[6]] <- paste(munged.content[[idx]][[6]], collapse=",")
+  }
+  
+  return(munged.content)
 }
-
 
 
 
