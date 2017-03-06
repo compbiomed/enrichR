@@ -1,5 +1,21 @@
 # EnrichR
 
+```{r settings}
+library(enrichR)
+fileNameOut <- "results/Figure2_functional_enrichment.xlsx"
+fdr.cutoff <- 1
+
+# Create (or, load)  Excel file
+unlink(fileNameOut)
+wb <- openxlsx::createWorkbook(fileNameOut) # openxlsx::loadWorkbook(fileName)
+```
+
+```{r loadData}
+res <- openxlsx::read.xlsx("data/DEGs_sig_p0.05_F1.3_24h.xlsx", cols = c(8, 2))
+up.genes <- sort(unique(res$Gene.Symbol[ res$log2FC > 0 ]))
+dn.genes <- sort(unique(res$Gene.Symbol[ res$log2FC < 0 ]))
+```
+
 ```{r}
 # A wrapper function to perform all functional enrichment analyses.
 # Helper function to save non-empty results
