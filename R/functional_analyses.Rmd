@@ -1,0 +1,218 @@
+# EnrichR
+
+```{r}
+# A wrapper function to perform all functional enrichment analyses.
+# Helper function to save non-empty results
+save_res <- function(res, fileName = fileName, wb = wb, sheetName = "KEGG") {
+  if (nrow(res) > 0) {
+    openxlsx::addWorksheet(wb = wb, sheetName = sheetName)
+    openxlsx::writeData(wb, res, sheet = sheetName)
+    openxlsx::saveWorkbook(wb, fileName, overwrite = TRUE)
+  }
+}
+
+# A wrapper to save the results
+save_enrichr <- function(up.genes = up.genes, dn.genes = NULL, databases = "KEGG_2016", fdr.cutoff = 1, fileNameOut = NULL, wb = NULL) {
+  print(paste("Running", databases, "analysis", sep = " "))
+  if (is.null(dn.genes)) {
+    res.kegg <- enrichGeneList(up.genes, databases = databases, fdr.cutoff = 1)
+  } else {
+    res.kegg <- enrichFullGeneList(up.genes, dn.genes, databases = databases, fdr.cutoff = 1)
+  }
+  
+  res.kegg$pval <- formatC(res.kegg$pval, digits = 3, format = "e")
+  res.kegg$qval <- formatC(res.kegg$qval, digits = 3, format = "e")
+  if (!is.null(fileNameOut)) {
+    if (nchar(databases) > 30) databases <- paste0(substr(databases, 1, 20), "_", substr(databases, nchar(databases) - 8, nchar(databases))) # If a database is longer that 30 characters, keep first 20 and last 10 characters
+    save_res(res.kegg, fileNameOut, wb = wb, sheetName = databases)
+  }
+  # Pause for a few seconds
+  pause_sec <- round(runif(1, min = 1, max = 10))
+  Sys.sleep(pause_sec)
+  return(res.kegg)
+}
+```
+
+## GO_Biological_Process_2015
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "GO_Biological_Process_2015", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## GO_Molecular_Function_2015
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "GO_Molecular_Function_2015", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## GO_Cellular_Component_2015
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "GO_Cellular_Component_2015", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## WikiPathways_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "WikiPathways_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## BioCarta_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "BioCarta_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## Reactome_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "Reactome_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## Panther_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "Panther_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## TRANSFAC_and_JASPAR_PWMs
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "TRANSFAC_and_JASPAR_PWMs", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## Genome_Browser_PWMs
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "Genome_Browser_PWMs", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## ChEA_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "ChEA_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## ENCODE_TF_ChIP-seq_2015
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "ENCODE_TF_ChIP-seq_2015", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## ENCODE_Histone_Modifications_2015
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "ENCODE_Histone_Modifications_2015", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+## Epigenomics_Roadmap_HM_ChIP-seq
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "Epigenomics_Roadmap_HM_ChIP-seq", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
+```
+
+<!--
+## Extended analyses `r if (extended_analysis) cat("was run") else cat("was not run")`
+
+
+See http://amp.pharm.mssm.edu/Enrichr/#stats for databases description
+
+- Genes_Associated_with_NIH_Grants
+- Cancer_Cell_Line_Encyclopedia
+- Achilles_fitness_decrease
+- Achilles_fitness_increase
+- Aging_Perturbations_from_GEO_down
+- Aging_Perturbations_from_GEO_up
+- Allen_Brain_Atlas_down
+- Allen_Brain_Atlas_up
+- Chromosome_Location
+- CORUM
+- dbGaP
+- Disease_Perturbations_from_GEO_down
+- Disease_Perturbations_from_GEO_up
+- Disease_Signatures_from_GEO_down_2014
+- Disease_Signatures_from_GEO_up_2014
+- Drug_Perturbations_from_GEO_2014
+- Drug_Perturbations_from_GEO_down
+- Drug_Perturbations_from_GEO_up
+- DrugMatrix
+- ESCAPE
+- GeneSigDB
+- Genome_Browser_PWMs
+- GTEx_Tissue_Sample_Gene_Expression_Profiles_down
+- GTEx_Tissue_Sample_Gene_Expression_Profiles_up
+- HMDB_Metabolites
+- HomoloGene
+- Human_Gene_Atlas
+- Human_Phenotype_Ontology
+- HumanCyc_2015
+- Humancyc_2016
+- KEA_2013
+- KEA_2015
+- Kinase_Perturbations_from_GEO_down
+- Kinase_Perturbations_from_GEO_up
+- Ligand_Perturbations_from_GEO_down
+- Ligand_Perturbations_from_GEO_up
+- LINCS_L1000_Chem_Pert_down
+- LINCS_L1000_Chem_Pert_up
+- LINCS_L1000_Kinase_Perturbations_down
+- LINCS_L1000_Kinase_Perturbations_up
+- LINCS_L1000_Ligand_Perturbations_down
+- LINCS_L1000_Ligand_Perturbations_up
+- MCF7_Perturbations_from_GEO_down
+- MCF7_Perturbations_from_GEO_up
+- MGI_Mammalian_Phenotype_2013
+- MGI_Mammalian_Phenotype_Level_3
+- MGI_Mammalian_Phenotype_Level_4
+- Microbe_Perturbations_from_GEO_down
+- Microbe_Perturbations_from_GEO_up
+- Mouse_Gene_Atlas
+- MSigDB_Computational
+- MSigDB_Oncogenic_Signatures
+- NCI-60_Cancer_Cell_Lines
+- NCI-Nature_2016
+- NURSA_Human_Endogenous_Complexome
+- Old_CMAP_down
+- Old_CMAP_up
+- OMIM_Disease
+- OMIM_Expanded
+- Pfam_InterPro_Domains
+- Phosphatase_Substrates_from_DEPOD
+- PPI_Hub_Proteins
+- SILAC_Phosphoproteomics
+- Single_Gene_Perturbations_from_GEO_down
+- Single_Gene_Perturbations_from_GEO_up
+- TargetScan_microRNA
+- TF-LOF_Expression_from_GEO
+- Tissue_Protein_Expression_from_Human_Proteome_Map
+- Tissue_Protein_Expression_from_ProteomicsDB
+- Transcription_Factor_PPIs
+- Virus_Perturbations_from_GEO_down
+- Virus_Perturbations_from_GEO_up
+- VirusMINT
+
+
+
+```{r}
+remaining_analyses <- c("Genes_Associated_with_NIH_Grants", "Cancer_Cell_Line_Encyclopedia", "Achilles_fitness_decrease", "Achilles_fitness_increase", "Aging_Perturbations_from_GEO_down", "Aging_Perturbations_from_GEO_up", "Allen_Brain_Atlas_down", "Allen_Brain_Atlas_up", "Chromosome_Location", "CORUM", "dbGaP", "Disease_Perturbations_from_GEO_down", "Disease_Perturbations_from_GEO_up", "Disease_Signatures_from_GEO_down_2014", "Disease_Signatures_from_GEO_up_2014", "Drug_Perturbations_from_GEO_2014", "Drug_Perturbations_from_GEO_down", "Drug_Perturbations_from_GEO_up", "DrugMatrix", "ESCAPE", "GeneSigDB", "Genome_Browser_PWMs", "GTEx_Tissue_Sample_Gene_Expression_Profiles_down", "GTEx_Tissue_Sample_Gene_Expression_Profiles_up", "HMDB_Metabolites", "HomoloGene", "Human_Gene_Atlas", "Human_Phenotype_Ontology", "HumanCyc_2015", "Humancyc_2016", "KEA_2013", "KEA_2015", "Kinase_Perturbations_from_GEO_down", "Kinase_Perturbations_from_GEO_up", "Ligand_Perturbations_from_GEO_down", "Ligand_Perturbations_from_GEO_up", "LINCS_L1000_Chem_Pert_down", "LINCS_L1000_Chem_Pert_up", "LINCS_L1000_Kinase_Perturbations_down", "LINCS_L1000_Kinase_Perturbations_up", "LINCS_L1000_Ligand_Perturbations_down", "LINCS_L1000_Ligand_Perturbations_up", "MCF7_Perturbations_from_GEO_down", "MCF7_Perturbations_from_GEO_up", "MGI_Mammalian_Phenotype_2013", "MGI_Mammalian_Phenotype_Level_3", "MGI_Mammalian_Phenotype_Level_4", "Microbe_Perturbations_from_GEO_down", "Microbe_Perturbations_from_GEO_up", "Mouse_Gene_Atlas", "MSigDB_Computational", "MSigDB_Oncogenic_Signatures", "NCI-60_Cancer_Cell_Lines", "NCI-Nature_2016", "NURSA_Human_Endogenous_Complexome", "Old_CMAP_down", "Old_CMAP_up", "OMIM_Disease", "OMIM_Expanded", "Pfam_InterPro_Domains", "Phosphatase_Substrates_from_DEPOD", "PPI_Hub_Proteins", "SILAC_Phosphoproteomics", "Single_Gene_Perturbations_from_GEO_down", "Single_Gene_Perturbations_from_GEO_up", "TargetScan_microRNA", "TF-LOF_Expression_from_GEO", "Tissue_Protein_Expression_from_Human_Proteome_Map", "Tissue_Protein_Expression_from_ProteomicsDB", "Transcription_Factor_PPIs", "Virus_Perturbations_from_GEO_down", "Virus_Perturbations_from_GEO_up", "VirusMINT")
+
+for (i in remaining_analyses) {
+  save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = i, fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+}
+```
+-->
+
+

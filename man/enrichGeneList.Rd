@@ -4,19 +4,30 @@
 \alias{enrichGeneList}
 \title{Perform functional enrichment on a set of genes.}
 \usage{
-enrichGeneList(gene.list, databases = db.list)
+enrichGeneList(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1)
 }
 \arguments{
-\item{gene.list}{a list of gene symbols}
+\item{gene.list}{a character vector of gene symbols. Required}
 
-\item{databases}{a list of Enrichr-fronted databases, as mentioned above}
+\item{databases}{a character vector of Enrichr-fronted databases. Default: KEGG_2016}
+
+\item{fdr.cutoff}{An FDR (adjusted p-value) threshold by which to limit the list of enriched pathways.
+Default = 0.1}
 }
 \description{
 This function interacts with Enrichr's REST API in order to perform functional enrichment of a single
 set of genes, for a set of specified databases which are already fronted by Enrichr.
 Databases are specified as seen in the web interface, with underscores for spaces
-(e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). There's no way to query Enrichr
-to get these database names, so they can't be provided as options. You'll just have to guess. Sorry :/
+(e.g. "WikiPathways_2016", "KEGG_2016", "GO_Biological_Process"). See \url{http://amp.pharm.mssm.edu/Enrichr/#stats}
+for more databases.
+}
+\examples{
+\\donotrun{
+# Analysis of genes associated with asperger syndrome
+genes <- c("DISC1", "ASPG4", "ASPG1", "ASPG2", "SLC6A4", "ASPG3", "FRAXE", "FRAXA", "FHIT", "NTM", "SLTM", "RASGRP4", "NOS2", "NOS1", "SHANK3", "DISC2", "TSNAX", "OXTR", "ARSD")
+res <- enrichGeneList(gene.list = genes, databases = c("KEGG_2016", "WikiPathways_2016"), fdr.cutoff = 0.1)
+DT::datatable(res)
+}
 }
 \keyword{Enrichr}
 \keyword{enrichment}
