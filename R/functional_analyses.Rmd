@@ -21,11 +21,12 @@ options(stringsAsFactors = FALSE, width=400)
 ```{r settings}
 library(enrichR)
 fileNameOut <- "results/Figure2_functional_enrichment.xlsx"
-fdr.cutoff <- 1
+p.adj.cutoff <- 0.1
+fdr.cutoff <- 0.3
 
 # Create (or, load)  Excel file
-unlink(fileNameOut)
-wb <- openxlsx::createWorkbook(fileNameOut) # openxlsx::loadWorkbook(fileName)
+# unlink(fileNameOut)
+wb <- openxlsx::loadWorkbook(fileName) # openxlsx::createWorkbook(fileNameOut)
 ```
 
 ```{r loadData}
@@ -65,6 +66,23 @@ save_enrichr <- function(up.genes = up.genes, dn.genes = NULL, databases = "KEGG
   Sys.sleep(pause_sec)
   return(res.kegg)
 }
+```
+
+- Up- and downregulated genes are tested for enrichment separately. Only genes at FDR < `r p.adj.cutoff` are analyzed.
+
+- Each table has enrichment results for up/downregulated genes. The "direction" column indicate which pathways are enriched in "UP"- or "DN"-regulated genes.
+
+- Use the "Search" box for each table, to filter the results for "UP" or "DN" only. Search is global within the table, case insensitive.
+
+- FDR cutoff of the significant enrichments - `r fdr.cutoff`.
+
+Legend: "database" - source of functional annotations, "category" - name of functional annotation,  "pval" - unadjusted enrichment p-value,  "qval" - FDR-adjusted p-value,  "genes" - comma-separated differentially expressed genes enriched in a corresponding functional category,  "direction" - UP/DN, an indicator whether genes are up- or downregulated.
+
+## KEGG_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "KEGG_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
 ```
 
 ## GO_Biological_Process_2015
