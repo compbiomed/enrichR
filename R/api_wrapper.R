@@ -81,6 +81,8 @@ enrichGeneList <- function(gene.list, databases = "KEGG_2016", fdr.cutoff = 0.1)
   }
 
   query.results <- as.data.frame(data.table::rbindlist(database.enrichments))
+  # Manually add colnames, they appear missing
+  colnames(query.results) <- c("database", "category", "pval", "qval", "genes")
   # Filter by FDR
   if (!is.null(fdr.cutoff)) {
     query.results <- query.results[query.results$qval < fdr.cutoff, ]
