@@ -1,4 +1,39 @@
+---
+title: ""
+author: "Mikhail Dozmorov"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# Set up the environment
+library(knitr)
+opts_chunk$set(cache.path='cache/', fig.path='img/', cache=F, tidy=T, fig.keep='high', echo=F, dpi=100, warnings=F, message=F, comment=NA, warning=F, results='as.is')
+library(pander)
+panderOptions('table.split.table', Inf)
+set.seed(1)
+library(dplyr)
+options(stringsAsFactors = FALSE, width=400)
+```
+
 # EnrichR
+
+```{r settings}
+library(enrichR)
+fileNameOut <- "results/Figure2_functional_enrichment.xlsx"
+p.adj.cutoff <- 0.1
+fdr.cutoff <- 0.3
+
+# Create (or, load)  Excel file
+# unlink(fileNameOut)
+wb <- openxlsx::loadWorkbook(fileName) # openxlsx::createWorkbook(fileNameOut)
+```
+
+```{r loadData}
+res <- openxlsx::read.xlsx("data/DEGs_sig_p0.05_F1.3_24h.xlsx", cols = c(8, 2))
+up.genes <- sort(unique(res$Gene.Symbol[ res$log2FC > 0 ]))
+dn.genes <- sort(unique(res$Gene.Symbol[ res$log2FC < 0 ]))
+```
 
 ```{r}
 # A wrapper function to perform all functional enrichment analyses.
@@ -31,6 +66,23 @@ save_enrichr <- function(up.genes = up.genes, dn.genes = NULL, databases = "KEGG
   Sys.sleep(pause_sec)
   return(res.kegg)
 }
+```
+
+- Up- and downregulated genes are tested for enrichment separately. Only genes at FDR < `r p.adj.cutoff` are analyzed.
+
+- Each table has enrichment results for up/downregulated genes. The "direction" column indicate which pathways are enriched in "UP"- or "DN"-regulated genes.
+
+- Use the "Search" box for each table, to filter the results for "UP" or "DN" only. Search is global within the table, case insensitive.
+
+- FDR cutoff of the significant enrichments - `r fdr.cutoff`.
+
+Legend: "database" - source of functional annotations, "category" - name of functional annotation,  "pval" - unadjusted enrichment p-value,  "qval" - FDR-adjusted p-value,  "genes" - comma-separated differentially expressed genes enriched in a corresponding functional category,  "direction" - UP/DN, an indicator whether genes are up- or downregulated.
+
+## KEGG_2016
+
+```{r}
+res.kegg <- save_enrichr(up.genes = up.genes, dn.genes = dn.genes, databases = "KEGG_2016", fdr.cutoff = fdr.cutoff, fileNameOut = fileNameOut, wb = wb)
+DT::datatable(res.kegg)
 ```
 
 ## GO_Biological_Process_2015
