@@ -15,9 +15,9 @@ save_res <- function(res, fileName = fileName, wb = wb, sheetName = "KEGG") {
 save_enrichr <- function(up.genes = up.genes, dn.genes = NULL, databases = "KEGG_2016", fdr.cutoff = 1, fileNameOut = NULL, wb = NULL) {
   print(paste("Running", databases, "analysis", sep = " "))
   if (is.null(dn.genes)) {
-    res.kegg <- enrichGeneList(up.genes, databases = databases, fdr.cutoff = 1)
+    res.kegg <- enrichGeneList(up.genes, databases = databases, fdr.cutoff = fdr.cutoff)
   } else {
-    res.kegg <- enrichFullGeneList(up.genes, dn.genes, databases = databases, fdr.cutoff = 1)
+    res.kegg <- enrichFullGeneList(up.genes, dn.genes, databases = databases, fdr.cutoff = fdr.cutoff)
   }
   
   res.kegg$pval <- formatC(res.kegg$pval, digits = 3, format = "e")
